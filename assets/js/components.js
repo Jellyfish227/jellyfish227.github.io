@@ -29,7 +29,63 @@ function setActiveNavItem() {
 }
 
 // Load components when the DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
-    loadComponent('header-placeholder', '/components/header.html');
-    loadComponent('footer-placeholder', '/components/footer.html');
-}); 
+document.addEventListener('DOMContentLoaded', function() {
+    // Load header
+    fetch('components/header.html')
+        .then(response => response.text())
+        .then(data => {
+            document.body.insertAdjacentHTML('afterbegin', data);
+            // Initialize mobile menu after header is loaded
+            initMobileMenu();
+            // Set active nav item
+            setActiveNavItem();
+        })
+        .catch(error => console.error('Error loading header:', error));
+
+    // Load footer
+    fetch('components/footer.html')
+        .then(response => response.text())
+        .then(data => {
+            document.querySelector('main').insertAdjacentHTML('afterend', data);
+        })
+        .catch(error => console.error('Error loading footer:', error));
+});
+
+function initMobileMenu() {
+    const mobileNavToggle = document.querySelector('.mobile-nav-toggle');
+    const navmenu = document.querySelector('#navmenu');
+    
+    if (mobileNavToggle && navmenu) {
+        // Handle mobile menu toggle
+        mobileNavToggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            document.body.classList.toggle('mobile-nav-active');
+            navmenu.classList.toggle('navbar-mobile');
+            this.classList.toggle('bi-list');
+            this.classList.toggle('bi-x');
+        });
+
+        // Handle dropdown menus
+        const dropdownLinks = document.querySelectorAll('.navmenu .dropdown > a');
+        dropdownLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                if (document.body.classList.contains('mobile-nav-active')) {
+                    e.preventDefault();
+                    this.closest('.dropdown').classList.toggle('dropdown-active');
+                }
+            });
+        });
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(e) {
+            if (document.body.classList.contains('mobile-nav-active') && 
+                !e.target.closest('#navmenu') && 
+                !e.target.closest('.mobile-nav-toggle')) {
+                document.body.classList.remove('mobile-nav-active');
+                navmenu.classList.remove('navbar-mobile');
+                mobileNavToggle.classList.remove('bi-x');
+                mobileNavToggle.classList.add('bi-list');
+            }
+        });
+    }
+} 
