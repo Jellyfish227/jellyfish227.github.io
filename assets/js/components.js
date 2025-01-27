@@ -37,55 +37,37 @@ document.addEventListener('DOMContentLoaded', function() {
             document.body.insertAdjacentHTML('afterbegin', data);
             // Initialize mobile menu after header is loaded
             initMobileMenu();
-            // Set active nav item
-            setActiveNavItem();
-        })
-        .catch(error => console.error('Error loading header:', error));
+        });
 
     // Load footer
     fetch('components/footer.html')
         .then(response => response.text())
         .then(data => {
             document.querySelector('main').insertAdjacentHTML('afterend', data);
-        })
-        .catch(error => console.error('Error loading footer:', error));
+            // Update current year
+            document.getElementById('currentYear').textContent = new Date().getFullYear();
+        });
 });
 
 function initMobileMenu() {
     const mobileNavToggle = document.querySelector('.mobile-nav-toggle');
-    const navmenu = document.querySelector('#navmenu');
+    const navmenu = document.querySelector('.navmenu');
     
     if (mobileNavToggle && navmenu) {
-        // Handle mobile menu toggle
         mobileNavToggle.addEventListener('click', function(e) {
-            e.preventDefault();
-            document.body.classList.toggle('mobile-nav-active');
             navmenu.classList.toggle('navbar-mobile');
             this.classList.toggle('bi-list');
             this.classList.toggle('bi-x');
         });
 
-        // Handle dropdown menus
-        const dropdownLinks = document.querySelectorAll('.navmenu .dropdown > a');
-        dropdownLinks.forEach(link => {
-            link.addEventListener('click', function(e) {
-                if (document.body.classList.contains('mobile-nav-active')) {
+        // Handle dropdowns in mobile view
+        document.querySelectorAll('.navmenu .dropdown > a').forEach(item => {
+            item.addEventListener('click', function(e) {
+                if (navmenu.classList.contains('navbar-mobile')) {
                     e.preventDefault();
-                    this.closest('.dropdown').classList.toggle('dropdown-active');
+                    this.nextElementSibling.classList.toggle('dropdown-active');
                 }
             });
-        });
-
-        // Close mobile menu when clicking outside
-        document.addEventListener('click', function(e) {
-            if (document.body.classList.contains('mobile-nav-active') && 
-                !e.target.closest('#navmenu') && 
-                !e.target.closest('.mobile-nav-toggle')) {
-                document.body.classList.remove('mobile-nav-active');
-                navmenu.classList.remove('navbar-mobile');
-                mobileNavToggle.classList.remove('bi-x');
-                mobileNavToggle.classList.add('bi-list');
-            }
         });
     }
 } 

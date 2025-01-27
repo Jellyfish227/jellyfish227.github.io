@@ -14,9 +14,11 @@
    */
   function toggleScrolled() {
     const selectBody = document.querySelector('body');
-    const selectHeader = document.querySelector('#header');
-    if (!selectHeader.classList.contains('scroll-up-sticky') && !selectHeader.classList.contains('sticky-top') && !selectHeader.classList.contains('fixed-top')) return;
-    window.scrollY > 100 ? selectBody.classList.add('scrolled') : selectBody.classList.remove('scrolled');
+    if (window.scrollY > 100) {
+      selectBody.classList.add('scrolled');
+    } else {
+      selectBody.classList.remove('scrolled');
+    }
   }
 
   document.addEventListener('scroll', toggleScrolled);
@@ -25,28 +27,40 @@
   /**
    * Mobile nav toggle
    */
-  const mobileNavToggleBtn = document.querySelector('.mobile-nav-toggle');
+  function initMobileNav() {
+    const mobileNavToggle = document.querySelector('.mobile-nav-toggle');
+    const body = document.querySelector('body');
+    
+    if (mobileNavToggle) {
+      mobileNavToggle.addEventListener('click', function(e) {
+        e.preventDefault();
+        body.classList.toggle('mobile-nav-active');
+        this.classList.toggle('bi-list');
+        this.classList.toggle('bi-x');
+      });
 
-  function mobileNavToogle() {
-    document.querySelector('body').classList.toggle('mobile-nav-active');
-    mobileNavToggleBtn.classList.toggle('bi-list');
-    mobileNavToggleBtn.classList.toggle('bi-x');
+      // Close mobile nav when clicking outside
+      document.addEventListener('click', function(e) {
+        if (!e.target.closest('.navmenu') && !e.target.closest('.mobile-nav-toggle')) {
+          body.classList.remove('mobile-nav-active');
+          mobileNavToggle.classList.remove('bi-x');
+          mobileNavToggle.classList.add('bi-list');
+        }
+      });
+
+      // Handle dropdown toggles
+      document.querySelectorAll('.navmenu .dropdown > a').forEach(item => {
+        item.addEventListener('click', function(e) {
+          if (window.innerWidth < 1200) {
+            e.preventDefault();
+            this.closest('.dropdown').classList.toggle('dropdown-active');
+          }
+        });
+      });
+    }
   }
-  if (mobileNavToggleBtn) {
-    mobileNavToggleBtn.addEventListener('click', mobileNavToogle);
-  }
 
-  /**
-   * Hide mobile nav on same-page/hash links
-   */
-  document.querySelectorAll('#navmenu a').forEach(navmenu => {
-    navmenu.addEventListener('click', () => {
-      if (document.querySelector('.mobile-nav-active')) {
-        mobileNavToogle();
-      }
-    });
-
-  });
+  window.addEventListener('load', initMobileNav);
 
   /**
    * Toggle mobile nav dropdowns
@@ -108,20 +122,25 @@
   window.addEventListener('load', aosInit);
 
   /**
-   * Init typed.js
+   * Typed text animation
    */
-  const selectTyped = document.querySelector('.typed');
-  if (selectTyped) {
-    let typed_strings = selectTyped.getAttribute('data-typed-items');
-    typed_strings = typed_strings.split(',');
-    new Typed('.typed', {
-      strings: typed_strings,
+  function initTyped() {
+    let typed = new Typed('.typed', {
+      strings: document.querySelector('.typed').getAttribute('data-typed-items').split(','),
       loop: true,
-      typeSpeed: 100,
+      typeSpeed: 80,
       backSpeed: 50,
-      backDelay: 2000
+      backDelay: 2000,
+      //startDelay: 1000  // 1 second delay before starting
     });
   }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    // Wait for 1.5 seconds before initializing Typed
+    setTimeout(() => {
+      initTyped();
+    }, 1800);
+  });
 
   /**
    * Initiate Pure Counter
