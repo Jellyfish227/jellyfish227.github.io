@@ -327,7 +327,9 @@ h6 {
     display: block;
     line-height: 0;
     transition: 0.5s;
-    position: relative;
+    position: fixed;
+    right: 20px;
+    top: 20px;
     z-index: 9999;
   }
 
@@ -367,6 +369,7 @@ h6 {
     padding: 10px 0;
     font-size: 15px;
     color: var(--nav-color);
+    font-family: var(--nav-font);
   }
 
   .navmenu .dropdown ul {

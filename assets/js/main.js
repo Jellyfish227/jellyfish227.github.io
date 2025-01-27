@@ -25,56 +25,6 @@
   window.addEventListener('load', toggleScrolled);
 
   /**
-   * Mobile nav toggle
-   */
-  function initMobileNav() {
-    const mobileNavToggle = document.querySelector('.mobile-nav-toggle');
-    const body = document.querySelector('body');
-    
-    if (mobileNavToggle) {
-      mobileNavToggle.addEventListener('click', function(e) {
-        e.preventDefault();
-        body.classList.toggle('mobile-nav-active');
-        this.classList.toggle('bi-list');
-        this.classList.toggle('bi-x');
-      });
-
-      // Close mobile nav when clicking outside
-      document.addEventListener('click', function(e) {
-        if (!e.target.closest('.navmenu') && !e.target.closest('.mobile-nav-toggle')) {
-          body.classList.remove('mobile-nav-active');
-          mobileNavToggle.classList.remove('bi-x');
-          mobileNavToggle.classList.add('bi-list');
-        }
-      });
-
-      // Handle dropdown toggles
-      document.querySelectorAll('.navmenu .dropdown > a').forEach(item => {
-        item.addEventListener('click', function(e) {
-          if (window.innerWidth < 1200) {
-            e.preventDefault();
-            this.closest('.dropdown').classList.toggle('dropdown-active');
-          }
-        });
-      });
-    }
-  }
-
-  window.addEventListener('load', initMobileNav);
-
-  /**
-   * Toggle mobile nav dropdowns
-   */
-  document.querySelectorAll('.navmenu .toggle-dropdown').forEach(navmenu => {
-    navmenu.addEventListener('click', function(e) {
-      e.preventDefault();
-      this.parentNode.classList.toggle('active');
-      this.parentNode.nextElementSibling.classList.toggle('dropdown-active');
-      e.stopImmediatePropagation();
-    });
-  });
-
-  /**
    * Preloader
    */
   const preloader = document.querySelector('#preloader');

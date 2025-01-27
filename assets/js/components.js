@@ -36,8 +36,11 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             document.body.insertAdjacentHTML('afterbegin', data);
             // Initialize mobile menu after header is loaded
-            initMobileMenu();
-        });
+            initMobileNav();
+            // Set active nav item
+            setActiveNavItem();
+        })
+        .catch(error => console.error('Error loading header:', error));
 
     // Load footer
     fetch('components/footer.html')
@@ -46,26 +49,63 @@ document.addEventListener('DOMContentLoaded', function() {
             document.querySelector('main').insertAdjacentHTML('afterend', data);
             // Update current year
             document.getElementById('currentYear').textContent = new Date().getFullYear();
-        });
+        })
+        .catch(error => console.error('Error loading footer:', error));
 });
 
-function initMobileMenu() {
+function initMobileNav() {
     const mobileNavToggle = document.querySelector('.mobile-nav-toggle');
-    const navmenu = document.querySelector('.navmenu');
+    const body = document.querySelector('body');
+    const navmenu = document.querySelector('#navmenu');
     
     if (mobileNavToggle && navmenu) {
-        mobileNavToggle.addEventListener('click', function(e) {
-            navmenu.classList.toggle('navbar-mobile');
+        // Remove any existing event listeners
+        const newMobileNavToggle = mobileNavToggle.cloneNode(true);
+        mobileNavToggle.parentNode.replaceChild(newMobileNavToggle, mobileNavToggle);
+        
+        // Handle mobile menu toggle
+        newMobileNavToggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            body.classList.toggle('mobile-nav-active');
             this.classList.toggle('bi-list');
             this.classList.toggle('bi-x');
         });
 
-        // Handle dropdowns in mobile view
-        document.querySelectorAll('.navmenu .dropdown > a').forEach(item => {
-            item.addEventListener('click', function(e) {
-                if (navmenu.classList.contains('navbar-mobile')) {
+        // Handle dropdown menus
+        const dropdownLinks = document.querySelectorAll('.navmenu .dropdown > a');
+        dropdownLinks.forEach(link => {
+            // Remove existing listeners
+            const newLink = link.cloneNode(true);
+            link.parentNode.replaceChild(newLink, link);
+            
+            newLink.addEventListener('click', function(e) {
+                if (window.innerWidth < 1200) {
                     e.preventDefault();
-                    this.nextElementSibling.classList.toggle('dropdown-active');
+                    e.stopPropagation();
+                    this.closest('.dropdown').classList.toggle('dropdown-active');
+                }
+            });
+        });
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(e) {
+            if (body.classList.contains('mobile-nav-active') && 
+                !e.target.closest('#navmenu') && 
+                !e.target.closest('.mobile-nav-toggle')) {
+                body.classList.remove('mobile-nav-active');
+                newMobileNavToggle.classList.remove('bi-x');
+                newMobileNavToggle.classList.add('bi-list');
+            }
+        });
+
+        // Close mobile menu when clicking on a nav link (except dropdowns)
+        navmenu.querySelectorAll('a:not(.dropdown > a)').forEach(link => {
+            link.addEventListener('click', () => {
+                if (body.classList.contains('mobile-nav-active')) {
+                    body.classList.remove('mobile-nav-active');
+                    newMobileNavToggle.classList.remove('bi-x');
+                    newMobileNavToggle.classList.add('bi-list');
                 }
             });
         });
